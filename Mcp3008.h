@@ -13,7 +13,7 @@ Notes: Hardware SPI pins needed are 13:Clock, 12: MISO, 11:MOSI
       the adcChipSelectPin is read in to the constructor
  
         If you want to get 10 bit values back as an integer
-        user #define MCP3008HIRES in this file
+        use #define MCP3008HIRES in this file
 
 */
 
@@ -27,7 +27,7 @@ class Mcp3008 {
   public:
     Mcp3008(byte adcChipSelectPin);
 #ifdef MCP3008HIRES
-    int read(byte adcNum);
+    word read(byte adcNum);
 #else
     byte read(byte adcNum);
 #endif

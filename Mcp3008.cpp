@@ -12,41 +12,52 @@ Mcp3008::Mcp3008(byte adcChipSelectPin) {
   
 }
 
-#ifdef MCP3008HIRES
-int Mcp3008::read(byte adcNum) {
-#else
-byte Mcp3008::read(byte adcNum) {
-#endif
-    
-  //Set up the byte to transfer to the ADC including the single/differential (S/D) bit and the address
-  byte _commandout = (B1000 | adcNum) << 4; // set the S/D bit to 1 (single), combine with address, shift bits to beginning of byte
-
-  //Pull chip select low to enable communication with the device
-  digitalWrite(_adcChipSelectPin, LOW);
 
 #ifdef MCP3008HIRES
-    //Send and receive data from the device
-    SPI.transfer(B1); // send the start bit with 7 leading zeroes.  SPI library takes care of formatting data
-    byte _adcout1 = SPI.transfer(_commandout); // send single/diff and address, receive first part of the adc value
-    byte _adcout2 = SPI.transfer(B0); // receive second part of the adc value.  chip doesn't care what you send
     
-    //Pull chip select high to disable communication with the device and open the SPI bus
+word Mcp3008::read(byte adcNum) {
+    
+    byte _commandout = (B00001000 | adcNum) << 4; // set the S/D bit to 1 (single), combine with address
+    word _adcout;
+    
+    //Pull chip select low
+    digitalWrite(_adcChipSelectPin, LOW);
+    
+    SPI.transfer(B1); // send the start bit with 7 leading zeroes.
+    
+    _adcout = SPI.transfer(_commandout); // send commandout, receive first two bits
+    _adcout &= B00000011; //only want the last two bits.  other data is garbage
+    _adcout <<= 8;  //make way for the next incoming byte
+    
+    _adcout &= SPI.transfer(B0); // receive second part of the adc value.  chip doesn't care what you send
+    
+    //Pull chip select high
     digitalWrite(_adcChipSelectPin, HIGH);
     
-    //Format and return the value
+    return _adcout;
 
-    return ((_adcout1 & B00000011)<<8) | _adcout2;
 #else
-    //Send and receive data from the device
-    SPI.transfer(B1); // send the start bit with 7 leading zeroes.  SPI library takes care of formatting data
-    byte _adcout = (SPI.transfer(_commandout) & B00000011) << 6; // send single/diff and address, receive first part of the adc value
-    _adcout = _adcout | ((SPI.transfer(B0) >> 2) & B00111111); // receive second part of the adc value.  chip doesn't care what you send
     
-    //Pull chip select high to disable communication with the device and open the SPI bus
+byte Mcp3008::read(byte adcNum) {
+
+    byte _commandout = B11000000 | (adcNum<<3);  // start bit, S/D bit, and address
+    byte _adcout;
+
+    //Pull chip select low
+    digitalWrite(_adcChipSelectPin, LOW);
+    
+    _adcout = SPI.transfer(_commandout);
+    _adcout &= B00000001; // we only get the first incoming bit for now.  the rest is garbage
+    _adcout <<= 7;
+    _adcout |= ((SPI.transfer(B0) >> 1) & B01111111); // get the rest of the bits. drop the last bit
+    
+    //Pull chip select high
     digitalWrite(_adcChipSelectPin, HIGH);
     
     //Return the value
     return _adcout;
+
 #endif
+
 }
 

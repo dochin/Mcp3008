@@ -3,8 +3,7 @@ MCP3008 ADC Over Serial
 
 Purpose: Read values from an MCP3008 connected through SPI and report as serial values
 
-Author: JGC
-HWVER: DRKTRD-06
+Author: Jason Campbell
 
 Changelog:
 5/18/14 Added hires option
@@ -19,7 +18,7 @@ Notes: channel and slaveSelectPin can be integers,
       By default this driver drops the two least significant
       bits to return an 8 bit value (0-255).  If you want
       to get all 10 bits add a #define MCP3008HIRES in the 
-      MCP3008.h file and when you store the results use and 'int'
+      MCP3008.h file and when you store the results use and 'word'
       instead of a 'byte.'  This will use slightly more memory, 
       but may be better for precision measurement applications.
 
@@ -33,7 +32,7 @@ myAdc.read(channel); //Channel is 0-7
 #include "SPI.h" //This driver depends on the SPI library for hardware fast SPI
 #include "Mcp3008.h"
 
-// Use pin for slave select and identify the hardware arduino slave select
+// Use pin for slave select and identify the hardware SPI slave select
 const byte slaveSelectPin = 9;
 const byte HWslaveSelectPin = 10;
 
@@ -56,7 +55,7 @@ void loop() {
     byte readValue = myAdc.read(channel); 
     
     //Send formatted serial data back 
-    Serial.print("channel:");
+    Serial.print("channel: ");
     Serial.print(channel);
     Serial.print("\tvalue:");
     Serial.print(readValue);
