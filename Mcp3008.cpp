@@ -1,4 +1,12 @@
-#include "MCP3008.h"
+/*
+MCP3008 Library Copyright 2014 by Jason Campbell
+
+Revisions:
+    infomaniac50 - Sun Mar  8 12:12:04 CDT 2015
+    On case-sensitive filesystems include statments must exactly match the filename.
+ */
+
+#include "Mcp3008.h"
 
 Mcp3008::Mcp3008(byte adcChipSelectPin) {
 
