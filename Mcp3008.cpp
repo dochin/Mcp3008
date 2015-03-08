@@ -1,4 +1,4 @@
-#include "Mcp3008.h"
+#include "MCP3008.h"
 
 Mcp3008::Mcp3008(byte adcChipSelectPin) {
 
